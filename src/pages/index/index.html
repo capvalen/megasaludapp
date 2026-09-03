@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MegaSalud · Bienvenida</title>
+  <link rel="icon" href="/src/assets/favicon.jpg">
+  <link rel="stylesheet" href="/src/css/estilos.css">
+</head>
+<body class="pagina-bienvenida">
+
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="marca">
+        <img src="/src/assets/favicon.jpg" alt="Logo MegaSalud" class="logo-nav">
+        <span class="marca-nombre">MegaSalud</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="contenedor bienvenida">
+
+    <section class="bienvenida-hero">
+      <img src="/src/assets/logo.jpg" alt="Logo MegaSalud" class="bienvenida-logo">
+      <h1>Bienvenido a MegaSalud</h1>
+      <p class="subtitulo">Consulta los procesos que tiene una persona en la Clínica MegaSalud Huancayo.</p>
+    </section>
+
+    <div class="bienvenida-grid">
+
+      <!-- Buscador por DNI -->
+      <section class="tarjeta bienvenida-buscador">
+        <h2>Buscar por DNI</h2>
+        <p class="subtitulo">Ingresa el DNI de la persona para ver sus procesos registrados.</p>
+        <label class="campo">
+          <span class="campo-etiqueta">DNI</span>
+          <input type="text" id="dniBusqueda" placeholder="ej. 12345678" inputmode="numeric" maxlength="8" autocomplete="off">
+          <span class="campo-ayuda" id="estadoBusqueda"></span>
+        </label>
+        <p class="bienvenida-admin">¿Eres administrador? <a href="../login/">Ingresa aquí</a></p>
+      </section>
+
+      <!-- Resultados -->
+      <section class="tarjeta bienvenida-resultados" id="resultados">
+        <div class="bienvenida-instructivo">
+          <p>Este aplicativo está desarrollado para <strong>confirmar la veracidad</strong> de los resultados que se hayan obtenido en nuestro centro clínico.</p>
+          <p>Empieza ingresando el DNI; a continuación, los resultados aparecerán aquí.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="/src/js/index.js"></script>
+</body>
+</html>

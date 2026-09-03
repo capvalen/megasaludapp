@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MegaSalud · Panel</title>
-  <link rel="icon" href="../public/logo.jpg">
-  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="icon" href="/src/assets/favicon.jpg">
+  <link rel="stylesheet" href="/src/css/estilos.css">
 </head>
 <body>
 
   <header class="navbar">
     <div class="navbar-inner">
       <div class="marca">
-        <img src="../public/logo.jpg" alt="Logo MegaSalud" class="logo-nav">
+        <img src="/src/assets/logo.jpg" alt="Logo MegaSalud" class="logo-nav">
         <span class="marca-nombre">MegaSalud</span>
       </div>
       <div class="navbar-derecha">
@@ -57,21 +57,6 @@
       <div class="paginacion" id="paginacion"></div>
     </section>
 
-    <!-- ===== Vista: perfil del paciente ===== -->
-    <section id="vistaPerfil" hidden>
-      <button class="btn btn-ghost btn-volver" id="btnVolver">← Volver a pacientes</button>
-      <div class="perfil-grid">
-        <aside class="tarjeta perfil-info" id="perfilInfo"></aside>
-        <div>
-          <div class="proc-cabecera">
-            <h2>Procedimientos</h2>
-            <button class="btn btn-primario" id="btnNuevoProc">+ Nuevo procedimiento</button>
-          </div>
-          <div class="lista-proc" id="listaProcedimientos"></div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
   <!-- ===== Modal: nuevo paciente ===== -->
@@ -107,48 +92,8 @@
     </div>
   </div>
 
-  <!-- ===== Modal: procedimiento (nuevo / editar) ===== -->
-  <div class="modal-fondo" id="modalProc" hidden>
-    <div class="modal">
-      <div class="modal-cabecera">
-        <h3 id="modalProcTitulo">Nuevo procedimiento</h3>
-        <button type="button" class="btn-cerrar" data-cerrar="modalProc" aria-label="Cerrar">×</button>
-      </div>
-      <form id="formProc" class="form-proc">
-        <input type="hidden" id="procId">
-        <label class="campo">
-          <span class="campo-etiqueta">Título *</span>
-          <input type="text" id="procTitulo" required placeholder="ej. Consulta general">
-        </label>
-        <label class="campo">
-          <span class="campo-etiqueta">Descripción</span>
-          <textarea id="procDescripcion" placeholder="Detalle del procedimiento…"></textarea>
-        </label>
-        <div class="fila-campos">
-          <label class="campo">
-            <span class="campo-etiqueta">Médico</span>
-            <input type="text" id="procMedico" placeholder="ej. Dr. Juan Pérez">
-          </label>
-          <label class="campo">
-            <span class="campo-etiqueta">Fecha de atención</span>
-            <input type="date" id="procFecha">
-          </label>
-        </div>
-        <label class="campo">
-          <span class="campo-etiqueta">Adjuntar archivos</span>
-          <input type="file" id="procArchivos" multiple>
-        </label>
-        <div class="modal-acciones">
-          <button type="button" class="btn btn-ghost" data-cerrar="modalProc">Cancelar</button>
-          <button type="submit" class="btn btn-primario" id="btnGuardarProc">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <div id="toast" class="toast" hidden></div>
 
-  <script src="../js/api.js"></script>
-  <script src="../js/dashboard.js"></script>
+  <script type="module" src="/src/js/dashboard.js"></script>
 </body>
 </html>

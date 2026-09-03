@@ -4,6 +4,8 @@
    antes de enviarlo al servidor.
    ============================================================ */
 
+import { login } from './api.js';
+
 const DOMINIO = '@megasaludhyo.com';
 
 document.addEventListener('DOMContentLoaded', () => {

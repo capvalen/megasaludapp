@@ -1,0 +1,2 @@
+# Bloquear la ejecución de scripts dentro de uploads
+php_flag engine off
