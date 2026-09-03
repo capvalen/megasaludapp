@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MegaSalud · Panel</title>
+  <link rel="icon" href="../public/logo.jpg">
+  <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="marca">
+        <img src="../public/logo.jpg" alt="Logo MegaSalud" class="logo-nav">
+        <span class="marca-nombre">MegaSalud</span>
+      </div>
+      <div class="navbar-derecha">
+        <span class="usuario-email" id="usuarioEmail"></span>
+        <button class="btn btn-ghost btn-sm" id="btnSalir">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="contenedor">
+
+    <!-- ===== Vista: lista de pacientes ===== -->
+    <section id="vistaLista">
+      <div class="vista-cabecera">
+        <div>
+          <h1>Pacientes</h1>
+          <p class="subtitulo" id="contadorPacientes">Cargando…</p>
+        </div>
+        <div class="cabecera-acciones">
+          <div class="buscador">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="search" id="buscarPaciente" placeholder="Buscar por DNI, apellidos, nombres o celular…">
+          </div>
+          <button class="btn btn-primario" id="btnNuevoPaciente">+ Nuevo paciente</button>
+        </div>
+      </div>
+
+      <div class="tabla-envoltura">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th data-campo="dni">DNI<span class="flecha"></span></th>
+              <th data-campo="apellidos">Apellidos<span class="flecha"></span></th>
+              <th data-campo="nombres">Nombres<span class="flecha"></span></th>
+              <th data-campo="celular">Celular<span class="flecha"></span></th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla"></tbody>
+        </table>
+      </div>
+      <div id="sinResultados" class="vacio" hidden>No se encontraron pacientes con esos criterios.</div>
+      <div class="paginacion" id="paginacion"></div>
+    </section>
+
+    <!-- ===== Vista: perfil del paciente ===== -->
+    <section id="vistaPerfil" hidden>
+      <button class="btn btn-ghost btn-volver" id="btnVolver">← Volver a pacientes</button>
+      <div class="perfil-grid">
+        <aside class="tarjeta perfil-info" id="perfilInfo"></aside>
+        <div>
+          <div class="proc-cabecera">
+            <h2>Procedimientos</h2>
+            <button class="btn btn-primario" id="btnNuevoProc">+ Nuevo procedimiento</button>
+          </div>
+          <div class="lista-proc" id="listaProcedimientos"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== Modal: nuevo paciente ===== -->
+  <div class="modal-fondo" id="modalPaciente" hidden>
+    <div class="modal">
+      <div class="modal-cabecera">
+        <h3>Nuevo paciente</h3>
+        <button type="button" class="btn-cerrar" data-cerrar="modalPaciente" aria-label="Cerrar">×</button>
+      </div>
+      <form id="formPaciente" class="form-proc" novalidate>
+        <label class="campo">
+          <span class="campo-etiqueta">DNI <span class="req">*</span></span>
+          <input type="text" id="pacDni" placeholder="ej. 12345678" inputmode="numeric" maxlength="8" required>
+          <span class="campo-ayuda" id="estadoDni"></span>
+        </label>
+        <label class="campo">
+          <span class="campo-etiqueta">Apellidos <span class="req">*</span></span>
+          <input type="text" id="pacApellidos" required placeholder="ej. Pérez Gómez">
+        </label>
+        <label class="campo">
+          <span class="campo-etiqueta">Nombres <span class="req">*</span></span>
+          <input type="text" id="pacNombres" required placeholder="ej. Juan Carlos">
+        </label>
+        <label class="campo">
+          <span class="campo-etiqueta">Celular</span>
+          <input type="tel" id="pacCelular" placeholder="ej. 987654321" inputmode="tel">
+        </label>
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-ghost" data-cerrar="modalPaciente">Cancelar</button>
+          <button type="submit" class="btn btn-primario" id="btnGuardarPaciente">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Modal: procedimiento (nuevo / editar) ===== -->
+  <div class="modal-fondo" id="modalProc" hidden>
+    <div class="modal">
+      <div class="modal-cabecera">
+        <h3 id="modalProcTitulo">Nuevo procedimiento</h3>
+        <button type="button" class="btn-cerrar" data-cerrar="modalProc" aria-label="Cerrar">×</button>
+      </div>
+      <form id="formProc" class="form-proc">
+        <input type="hidden" id="procId">
+        <label class="campo">
+          <span class="campo-etiqueta">Título *</span>
+          <input type="text" id="procTitulo" required placeholder="ej. Consulta general">
+        </label>
+        <label class="campo">
+          <span class="campo-etiqueta">Descripción</span>
+          <textarea id="procDescripcion" placeholder="Detalle del procedimiento…"></textarea>
+        </label>
+        <div class="fila-campos">
+          <label class="campo">
+            <span class="campo-etiqueta">Médico</span>
+            <input type="text" id="procMedico" placeholder="ej. Dr. Juan Pérez">
+          </label>
+          <label class="campo">
+            <span class="campo-etiqueta">Fecha de atención</span>
+            <input type="date" id="procFecha">
+          </label>
+        </div>
+        <label class="campo">
+          <span class="campo-etiqueta">Adjuntar archivos</span>
+          <input type="file" id="procArchivos" multiple>
+        </label>
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-ghost" data-cerrar="modalProc">Cancelar</button>
+          <button type="submit" class="btn btn-primario" id="btnGuardarProc">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>

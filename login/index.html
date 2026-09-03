@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MegaSalud · Iniciar sesión</title>
+  <link rel="icon" href="../public/logo.jpg">
+  <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body class="pagina-login">
+
+  <main class="login-tarjeta">
+    <img src="../public/logo.jpg" alt="Logo MegaSalud" class="login-logo">
+    <h1 class="login-titulo">MegaSalud</h1>
+    <p class="login-subtitulo">Sistema de gestión de pacientes</p>
+
+    <form id="formLogin" class="login-form" novalidate>
+      <label class="campo">
+        <span class="campo-etiqueta">Usuario</span>
+        <input type="text" id="usuario" placeholder="ej. juan.perez" autocomplete="username" autofocus>
+        <span class="campo-sufijo" id="previewEmail"></span>
+      </label>
+
+      <label class="campo">
+        <span class="campo-etiqueta">Contraseña</span>
+        <div class="campo-contenedor">
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="ojo" id="btnOjo" aria-label="Mostrar u ocultar contraseña">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </label>
+
+      <p class="login-error" id="errorLogin" hidden></p>
+
+      <button type="submit" class="btn btn-primario btn-grande" id="btnIngresar">Ingresar</button>
+    </form>
+
+    <p class="login-pie">Acceso restringido al personal autorizado</p>
+  </main>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/login.js"></script>
+</body>
+</html>
