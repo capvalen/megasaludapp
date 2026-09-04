@@ -3,7 +3,7 @@
   "short_name": "MegaSalud",
   "description": "Sistema de gestión de pacientes de la Clínica MegaSalud Huancayo.",
   "lang": "es",
-  "start_url": "/bienvenida/",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

@@ -7,10 +7,10 @@
 
 const CACHE = 'megasalud-v1';
 
-// Instalación: precachear la página de bienvenida
+// Instalación: precachear la página de inicio
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(['/bienvenida/', '/manifest.webmanifest']))
+    caches.open(CACHE).then((c) => c.addAll(['/', '/manifest.webmanifest']))
   );
   self.skipWaiting();
 });
@@ -39,7 +39,7 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put(request, copia));
           return res;
         })
-        .catch(() => caches.match(request).then((r) => r || caches.match('/bienvenida/')))
+        .catch(() => caches.match(request).then((r) => r || caches.match('/')))
     );
     return;
   }
