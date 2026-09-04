@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MegaSalud · Perfil del paciente</title>
   <link rel="icon" href="/src/assets/favicon.jpg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1a6ae0">
   <link rel="stylesheet" href="/src/css/estilos.css">
 </head>
 <body>
@@ -13,11 +15,11 @@
     <div class="navbar-inner">
       <div class="marca">
         <img src="/src/assets/logo.jpg" alt="Logo MegaSalud" class="logo-nav">
-        <span class="marca-nombre">MegaSalud</span>
+        <span class="marca-nombre">MegaSalud Huancayo</span>
       </div>
       <div class="navbar-derecha">
         <span class="usuario-email" id="usuarioEmail"></span>
-        <button class="btn btn-ghost btn-sm" id="btnSalir">Salir</button>
+        <button class="btn btn-ghost btn-sm" id="btnSalir"><i class="ti ti-logout"></i> Salir</button>
       </div>
     </div>
   </header>
@@ -32,7 +34,10 @@
         <div>
           <div class="proc-cabecera">
             <h2>Procedimientos</h2>
-            <button class="btn btn-primario" id="btnNuevoProc">+ Nuevo procedimiento</button>
+            <div class="proc-cabecera-acciones">
+              <button class="btn btn-ghost btn-sm" id="btnOrdenProc" title="Cambiar orden">↕ Ordenar</button>
+              <button class="btn btn-primario" id="btnNuevoProc">+ Nuevo procedimiento</button>
+            </div>
           </div>
           <div class="lista-proc" id="listaProcedimientos"></div>
         </div>
@@ -68,10 +73,20 @@
             <input type="date" id="procFecha">
           </label>
         </div>
-        <label class="campo">
+        <div class="campo">
           <span class="campo-etiqueta">Adjuntar archivos</span>
-          <input type="file" id="procArchivos" multiple>
-        </label>
+          <div id="dropzoneArchivos" class="dropzone">
+            <div class="dz-message">
+              <svg class="dz-icono" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>np
+              <p class="dz-texto">Arrastra archivos aquí o haz clic para seleccionar</p>
+              <p class="dz-subtexto">PDF, JPG o JPEG · hasta 10 MB por archivo</p>
+            </div>
+          </div>
+        </div>
         <div class="modal-acciones">
           <button type="button" class="btn btn-ghost" data-cerrar="modalProc">Cancelar</button>
           <button type="submit" class="btn btn-primario" id="btnGuardarProc">Guardar</button>

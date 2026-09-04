@@ -11,5 +11,9 @@
   "devDependencies": {
     "vite": "^7.0.0",
     "vite-plugin-mpa": "^1.2.0"
+  },
+  "dependencies": {
+    "@tabler/icons-webfont": "^3.46.0",
+    "dropzone": "^6.0.0-beta.2"
   }
 }

@@ -8,7 +8,7 @@ Sistema ligero de gestión de pacientes para **MegaSalud**, hecho con HTML, CSS 
 megasaludapp/
 ├── src/
 │   ├── pages/
-│   │   ├── index/index.html      → Bienvenida pública (búsqueda por DNI)
+│   │   ├── bienvenida/index.html → Bienvenida pública (búsqueda por DNI)
 │   │   ├── login/index.html      → Login (usuario + contraseña)
 │   │   ├── dashboard/index.html  → Lista de pacientes
 │   │   └── perfil/index.html     → Perfil del paciente y sus procedimientos
@@ -26,7 +26,7 @@ megasaludapp/
 
 ## Funcionalidades
 
-- **Bienvenida pública** (`/`): saludo e instructivo, con un buscador por DNI (autocomplete desactivado, debounce de 300 ms al completar 8 dígitos). Si el DNI tiene procesos registrados, se muestran al costado (datos del paciente y sus procedimientos en texto simple). Debajo del buscador hay un aviso "¿Eres administrador? Ingresa aquí" con enlace al login.
+- **Bienvenida pública** (`/`): saludo e instructivo, con un buscador por DNI (autocomplete desactivado). La búsqueda se dispara con **Enter** o con el **botón de lupa**. Si el DNI tiene procesos registrados, se muestran al costado: datos del paciente y sus procedimientos en tarjetas (igual que en el perfil). Debajo del buscador hay un aviso "¿Eres administrador? Ingresa aquí" con enlace al login.
 - **Login**: el usuario se envía con el dominio `@megasaludhyo.com` agregado automáticamente (ej. `juan.perez` → `juan.perez@megasaludhyo.com`). Al autenticarse se guarda el **id** del usuario y el token en `localStorage`.
 - **Dashboard**: tabla de pacientes (`msh_pacientes`) con **búsqueda** (DNI, apellidos, nombres, celular), **ordenamiento** por columna, paginación y botón **"+ Nuevo paciente"** para registrar pacientes (DNI, apellidos, nombres, celular).
 - **Autocompletado por DNI**: al escribir 8 dígitos en el campo DNI (con debounce de 300 ms) se consulta `https://dnis.infocat.workers.dev/api/dni/{dni}/{token}` y se autocompletan apellidos y nombres. Si la API devuelve 0 resultados o un error 40x, aparece la notificación "DNI no encontrado" abajo a la derecha.

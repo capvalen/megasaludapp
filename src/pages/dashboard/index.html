@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MegaSalud · Panel</title>
   <link rel="icon" href="/src/assets/favicon.jpg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1a6ae0">
   <link rel="stylesheet" href="/src/css/estilos.css">
 </head>
 <body>
@@ -13,11 +15,11 @@
     <div class="navbar-inner">
       <div class="marca">
         <img src="/src/assets/logo.jpg" alt="Logo MegaSalud" class="logo-nav">
-        <span class="marca-nombre">MegaSalud</span>
+        <span class="marca-nombre">MegaSalud Huancayo</span>
       </div>
       <div class="navbar-derecha">
         <span class="usuario-email" id="usuarioEmail"></span>
-        <button class="btn btn-ghost btn-sm" id="btnSalir">Salir</button>
+        <button class="btn btn-ghost btn-sm" id="btnSalir"><i class="ti ti-logout"></i> Salir</button>
       </div>
     </div>
   </header>
@@ -33,9 +35,12 @@
         </div>
         <div class="cabecera-acciones">
           <div class="buscador">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <i class="ti ti-search"></i>
             <input type="search" id="buscarPaciente" placeholder="Buscar por DNI, apellidos, nombres o celular…">
           </div>
+          <button class="btn btn-ghost" id="btnOrdenPacientes" title="Cambiar orden">
+            <i class="ti ti-sort-ascending"></i> <span id="btnOrdenTexto">A-Z</span>
+          </button>
           <button class="btn btn-primario" id="btnNuevoPaciente">+ Nuevo paciente</button>
         </div>
       </div>

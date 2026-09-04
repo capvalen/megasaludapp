@@ -1,0 +1,19 @@
+# ============================================================
+# MegaSalud · subida/
+# CORS para subida.php y para los archivos estáticos de uploads/
+# (los archivos estáticos no pasan por PHP, por eso se necesita
+#  este archivo para que lleven cabeceras CORS).
+# ============================================================
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+</IfModule>
+
+# Responder 200 al preflight OPTIONS (por si el servidor no llega a PHP)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>

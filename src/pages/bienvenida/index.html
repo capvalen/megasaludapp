@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MegaSalud · Bienvenida</title>
   <link rel="icon" href="/src/assets/favicon.jpg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1a6ae0">
   <link rel="stylesheet" href="/src/css/estilos.css">
 </head>
 <body class="pagina-bienvenida">
@@ -13,7 +15,7 @@
     <div class="navbar-inner">
       <div class="marca">
         <img src="/src/assets/favicon.jpg" alt="Logo MegaSalud" class="logo-nav">
-        <span class="marca-nombre">MegaSalud</span>
+        <span class="marca-nombre">MegaSalud Huancayo</span>
       </div>
     </div>
   </header>
@@ -23,8 +25,17 @@
     <section class="bienvenida-hero">
       <img src="/src/assets/logo.jpg" alt="Logo MegaSalud" class="bienvenida-logo">
       <h1>Bienvenido a MegaSalud</h1>
-      <p class="subtitulo">Consulta los procesos que tiene una persona en la Clínica MegaSalud Huancayo.</p>
+      <p class="subtitulo">Consulta de procesos atendidos de nuestros pacientes.</p>
     </section>
+
+    <!-- Aviso de privacidad -->
+    <div class="bienvenida-aviso" role="alert">
+      <i class="ti ti-alert-triangle bienvenida-aviso-icono"></i>
+      <div>
+        <strong>Información de datos privados</strong>
+        <p>Los datos recopilados por la aplicación son proporcionados por la clínica, los cuales sirven para el uso, ubicación y verificación de los resultados obtenidos luego de atenderse en nuestro establecimiento.</p>
+      </div>
+    </div>
 
     <div class="bienvenida-grid">
 
@@ -34,7 +45,15 @@
         <p class="subtitulo">Ingresa el DNI de la persona para ver sus procesos registrados.</p>
         <label class="campo">
           <span class="campo-etiqueta">DNI</span>
-          <input type="text" id="dniBusqueda" placeholder="ej. 12345678" inputmode="numeric" maxlength="8" autocomplete="off">
+          <div class="buscador-dni">
+            <input type="text" id="dniBusqueda" placeholder="ej. 12345678" inputmode="numeric" maxlength="8" autocomplete="off">
+            <button type="button" class="btn btn-primario btn-lupa" id="btnBuscarDni" title="Buscar DNI" aria-label="Buscar DNI">
+              <i class="ti ti-search"></i>
+            </button>
+            <button type="button" class="btn btn-ghost btn-limpiar" id="btnLimpiarDni" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">
+              <i class="ti ti-eraser"></i>
+            </button>
+          </div>
           <span class="campo-ayuda" id="estadoBusqueda"></span>
         </label>
         <p class="bienvenida-admin">¿Eres administrador? <a href="../login/">Ingresa aquí</a></p>

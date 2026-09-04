@@ -4,6 +4,9 @@
    (crear, editar, eliminar, adjuntos). Página: perfil.html
    ============================================================ */
 
+import Dropzone from 'dropzone';
+import 'dropzone/dist/dropzone.css';
+
 import {
   getToken,
   getUsuarioEmail,
@@ -12,18 +15,25 @@ import {
   obtenerProcedimientos,
   crearProcedimiento,
   actualizarProcedimiento,
-  subirArchivos,
   actualizarDocumentos,
-  urlArchivo,
   apiFetch,
   COL_PROCEDIMIENTOS,
   CAMPO_ARCHIVO,
+  URL_SUBIDA,
+  URL_ARCHIVOS_SUBIDA,
 } from './api.js';
+
+// Registro del service worker (PWA instalable)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
 
 const estado = {
   paciente: null,
   procedimientos: [],
   editandoProc: null,
+  archivosSubidos: [], // nombres devueltos por subida.php
+  ordenProc: 'desc',  // 'desc' = más recientes primero | 'asc' = más antiguos primero
 };
 
 // Campos opcionales que se muestran en el perfil si existen en msh_pacientes
@@ -38,12 +48,14 @@ const CAMPOS_OPCIONALES = [
 ];
 
 const ICONOS = {
-  calendario: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-  medico: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
-  papel: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>',
-  descargar: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
-  basura: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
-  lapiz: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  calendario: '<i class="ti ti-calendar"></i>',
+  medico: '<i class="ti ti-stethoscope"></i>',
+  papel: '<i class="ti ti-paperclip"></i>',
+  descargar: '<i class="ti ti-download"></i>',
+  basura: '<i class="ti ti-trash"></i>',
+  lapiz: '<i class="ti ti-pencil"></i>',
+  flechaAbajo: '<i class="ti ti-arrow-down"></i>',
+  flechaArriba: '<i class="ti ti-arrow-up"></i>',
 };
 
 document.addEventListener('DOMContentLoaded', iniciar);
@@ -54,6 +66,8 @@ async function iniciar() {
   if (!getToken()) { location.href = '../login/index.html'; return; }
   document.getElementById('usuarioEmail').textContent = getUsuarioEmail() || '';
   bindEventos();
+  actualizarBotonOrden();
+  configurarDropzone();
 
   // El id del paciente viene en la URL: /perfil/?id=...
   const id = new URLSearchParams(location.search).get('id');
@@ -84,13 +98,12 @@ function bindEventos() {
   document.getElementById('btnSalir').addEventListener('click', cerrarSesion);
   document.getElementById('btnVolver').addEventListener('click', () => { location.href = '../dashboard/'; });
   document.getElementById('btnNuevoProc').addEventListener('click', abrirModalNuevo);
+  document.getElementById('btnOrdenProc').addEventListener('click', alternarOrden);
   document.getElementById('formProc').addEventListener('submit', guardarProcedimiento);
 
-  // Cerrar modales
+  // Cerrar modales (solo con el botón X o Cancelar; el clic fuera NO cierra)
   document.querySelectorAll('[data-cerrar]').forEach((b) =>
     b.addEventListener('click', () => cerrarModal(b.dataset.cerrar)));
-  document.querySelectorAll('.modal-fondo').forEach((m) =>
-    m.addEventListener('click', (e) => { if (e.target === m) cerrarModal(m.id); }));
 
   // Acciones dentro de las tarjetas de procedimientos (delegación)
   document.getElementById('listaProcedimientos').addEventListener('click', (e) => {
@@ -131,21 +144,44 @@ function renderPerfilInfo(p) {
 
 function procedimientosDelPaciente() {
   const id = estado.paciente.id;
-  return estado.procedimientos.filter((pr) =>
-    pr.paciente === id || pr.paciente_id === id || (pr.paciente && pr.paciente.id === id));
+  return estado.procedimientos.filter((pr) => pr.paciente_id === id);
+}
+
+// Ordena por fecha de atención (o fecha de creación si no hay) según estado.ordenProc
+function compararProcedimientos(a, b) {
+  const fa = a.fecha || a.created || '';
+  const fb = b.fecha || b.created || '';
+  const cmp = String(fa).localeCompare(String(fb));
+  return estado.ordenProc === 'desc' ? -cmp : cmp;
+}
+
+function alternarOrden() {
+  estado.ordenProc = estado.ordenProc === 'desc' ? 'asc' : 'desc';
+  actualizarBotonOrden();
+  renderProcedimientos();
+}
+
+function actualizarBotonOrden() {
+  const btn = document.getElementById('btnOrdenProc');
+  const desc = estado.ordenProc === 'desc';
+  btn.innerHTML = (desc ? ICONOS.flechaAbajo : ICONOS.flechaArriba) + ' ' +
+    (desc ? 'Más recientes' : 'Más antiguos');
+  btn.title = desc
+    ? 'Ordenar de más antiguo a más reciente'
+    : 'Ordenar de más reciente a más antiguo';
 }
 
 function renderProcedimientos() {
-  const lista = procedimientosDelPaciente();
+  const lista = procedimientosDelPaciente().sort(compararProcedimientos);
   const cont = document.getElementById('listaProcedimientos');
   if (!lista.length) {
     cont.innerHTML = '<div class="vacio"><p>Este paciente aún no tiene procedimientos registrados.</p></div>';
     return;
   }
-  cont.innerHTML = lista.map(tarjetaProcedimiento).join('');
+  cont.innerHTML = lista.map((pr, i) => tarjetaProcedimiento(pr, i + 1)).join('');
 }
 
-function tarjetaProcedimiento(pr) {
+function tarjetaProcedimiento(pr, numero) {
   const docs = normalizarDocs(pr.documentos);
   const docsHtml = docs.length
     ? '<div class="proc-docs">' + docs.map((d, i) =>
@@ -160,7 +196,10 @@ function tarjetaProcedimiento(pr) {
 
   return '<article class="proc-tarjeta">' +
     '<div class="proc-cabecera-tarjeta">' +
-      '<h3>' + esc(pr.titulo || 'Sin título') + '</h3>' +
+      '<div class="proc-titulo-num">' +
+        '<span class="badge-num">' + numero + '</span>' +
+        '<h3>' + esc(pr.titulo || 'Sin título') + '</h3>' +
+      '</div>' +
       '<span class="badge-fecha">' + ICONOS.calendario + ' ' + formatearFecha(pr.fecha) + '</span>' +
     '</div>' +
     '<p class="proc-medico">' + ICONOS.medico + ' ' + esc(pr.medico || 'Médico no registrado') + '</p>' +
@@ -173,10 +212,69 @@ function tarjetaProcedimiento(pr) {
   '</article>';
 }
 
+/* ---------- Dropzone (adjuntos) ---------- */
+
+let dropzone = null;
+
+// Configura la zona de arrastre: cada archivo se sube de inmediato a
+// subida.php y su nombre devuelto se acumula en estado.archivosSubidos.
+function configurarDropzone() {
+  dropzone = new Dropzone('#dropzoneArchivos', {
+    url: URL_SUBIDA,
+    paramName: 'archivo',
+    maxFilesize: 10, // MB
+    acceptedFiles: '.pdf,.jpg,.jpeg',
+    addRemoveLinks: true,
+    dictRemoveFile: 'Quitar',
+    dictFileTooBig: 'El archivo es demasiado grande ({{filesize}}MB). Máximo {{maxFilesize}}MB.',
+    dictInvalidFileType: 'Tipo de archivo no permitido. Solo PDF, JPG o JPEG.',
+    dictResponseError: 'No se pudo subir el archivo.',
+  });
+
+  // Subida correcta: guardar el nombre devuelto por subida.php
+  dropzone.on('success', (file, resp) => {
+    if (resp && resp.ok && resp.nombre) {
+      file.nombreSubido = resp.nombre;
+      estado.archivosSubidos.push(resp.nombre);
+    } else {
+      marcarErrorDropzone(file, (resp && resp.error) || 'No se pudo subir el archivo');
+    }
+  });
+
+  // Validación estricta de tamaño: ningún archivo puede superar 10 MB
+  const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+  dropzone.on('addedfile', (file) => {
+    if (file.size > MAX_BYTES) {
+      dropzone.removeFile(file);
+      mostrarToast('El archivo "' + (file.name || '') + '" supera los 10 MB y no se subió.', 'error');
+    }
+  });
+
+  // Si el usuario quita un archivo, no incluirlo en el JSON
+  dropzone.on('removedfile', (file) => {
+    if (file.nombreSubido) {
+      estado.archivosSubidos = estado.archivosSubidos.filter((n) => n !== file.nombreSubido);
+    }
+  });
+}
+
+function marcarErrorDropzone(file, mensaje) {
+  if (!file.previewElement) return;
+  file.previewElement.classList.add('dz-error');
+  const el = file.previewElement.querySelector('[data-dz-errormessage]');
+  if (el) el.textContent = mensaje;
+}
+
+function limpiarDropzone() {
+  estado.archivosSubidos = [];
+  if (dropzone) dropzone.removeAllFiles();
+}
+
 /* ---------- CRUD de procedimientos ---------- */
 
 function abrirModalNuevo() {
   estado.editandoProc = null;
+  limpiarDropzone();
   document.getElementById('formProc').reset();
   document.getElementById('procId').value = '';
   document.getElementById('modalProcTitulo').textContent = 'Nuevo procedimiento';
@@ -186,12 +284,12 @@ function abrirModalNuevo() {
 
 function abrirModalEditar(pr) {
   estado.editandoProc = pr;
+  limpiarDropzone();
   document.getElementById('procId').value = pr.id;
   document.getElementById('procTitulo').value = pr.titulo || '';
   document.getElementById('procDescripcion').value = pr.descripcion || '';
   document.getElementById('procMedico').value = pr.medico || '';
   document.getElementById('procFecha').value = pr.fecha ? String(pr.fecha).slice(0, 10) : '';
-  document.getElementById('procArchivos').value = '';
   document.getElementById('modalProcTitulo').textContent = 'Editar procedimiento';
   abrirModal('modalProc');
 }
@@ -199,12 +297,11 @@ function abrirModalEditar(pr) {
 async function guardarProcedimiento(e) {
   e.preventDefault();
   const datos = {
-    titulo: document.getElementById('procTitulo').value.trim(),
-    descripcion: document.getElementById('procDescripcion').value.trim(),
-    medico: document.getElementById('procMedico').value.trim(),
+    titulo: capitalizarPrimera(document.getElementById('procTitulo').value),
+    descripcion: capitalizarPrimera(document.getElementById('procDescripcion').value),
+    medico: capitalizarPrimera(document.getElementById('procMedico').value),
     fecha: document.getElementById('procFecha').value || null,
   };
-  const archivos = document.getElementById('procArchivos').files;
   const btn = document.getElementById('btnGuardarProc');
   btn.disabled = true;
   btn.textContent = 'Guardando…';
@@ -217,26 +314,21 @@ async function guardarProcedimiento(e) {
       proc = await crearProcedimiento(estado.paciente.id, datos);
     }
 
-    // Subir adjuntos y guardar sus URLs en el JSON "documentos"
-    if (archivos.length) {
-      const actualizado = await subirArchivos(proc.id, archivos);
-      const nombres = Array.isArray(actualizado.adjunto)
-        ? actualizado.adjunto
-        : (actualizado.adjunto ? [actualizado.adjunto] : []);
-      if (!nombres.length) {
-        mostrarToast('El procedimiento se guardó, pero no se pudo adjuntar el archivo. Revisa el campo CAMPO_ARCHIVO en js/api.js.', 'error');
-      } else {
-        const docs = normalizarDocs(actualizado.documentos);
-        nombres.forEach((n) => docs.push({ name: n, url: urlArchivo(proc.id, n) }));
-        proc = await actualizarDocumentos(proc.id, docs);
-      }
+    // Adjuntos subidos vía subida.php: agregar sus URLs al JSON "documentos"
+    if (estado.archivosSubidos.length) {
+      const docs = normalizarDocs(proc.documentos);
+      estado.archivosSubidos.forEach((n) => docs.push({ name: n, url: URL_ARCHIVOS_SUBIDA + n }));
+      proc = await actualizarDocumentos(proc.id, docs);
     }
 
     reemplazarProc(proc);
+    // Refrescar la lista desde el servidor para incluir el nuevo registro
+    estado.procedimientos = await obtenerProcedimientos();
     cerrarModal('modalProc');
     renderProcedimientos();
     mostrarToast(estado.editandoProc ? 'Procedimiento actualizado' : 'Procedimiento registrado', 'ok');
     estado.editandoProc = null;
+    limpiarDropzone();
   } catch (err) {
     mostrarToast('Error: ' + err.message, 'error');
   } finally {
@@ -313,6 +405,12 @@ function formatearFecha(f) {
   const d = new Date(f);
   if (isNaN(d)) return f;
   return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// Pone la primera letra en mayúscula y deja el resto tal como se ingresó
+function capitalizarPrimera(v) {
+  const s = String(v ?? '').trim();
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 }
 
 function iniciales(p) {

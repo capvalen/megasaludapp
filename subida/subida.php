@@ -7,6 +7,18 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
+// CORS: permite que la app (otro origen) suba archivos desde el navegador
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Cache-Control, X-Requested-With');
+
+// Preflight CORS: el navegador envía OPTIONS antes del POST real.
+// Responder 200 sin procesar nada.
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 // Extensiones permitidas
 $PERMITIDAS = ['pdf', 'jpg', 'jpeg'];
 

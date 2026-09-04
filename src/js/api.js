@@ -20,6 +20,13 @@ export const COL_PROCEDIMIENTOS = 'msh_procedimientos';
 // Si tu colección usa otro nombre (ej. "archivo", "adjuntos"), cámbialo aquí.
 export const CAMPO_ARCHIVO = 'adjunto';
 
+// Subida de archivos vía subida.php (servidor externo).
+// El script devuelve { ok, nombre } con el nombre único guardado.
+export const URL_SUBIDA = 'https://apps.infocatsoluciones.com/megasaludhyo/subida/subida.php';
+
+// URL base donde quedan publicados los archivos subidos por subida.php
+export const URL_ARCHIVOS_SUBIDA = 'https://apps.infocatsoluciones.com/megasaludhyo/subida/uploads/';
+
 /* ---------- Consulta de DNI (RENIEC) ---------- */
 
 // Token de la API de consulta de DNI (proviene del archivo .env).
@@ -162,12 +169,11 @@ export async function obtenerProcedimientos() {
 }
 
 // Crea un procedimiento vinculado al paciente.
-// Se envían "paciente" y "paciente_id" para soportar ambos nombres de campo
-// de relación (PocketBase ignora los campos desconocidos).
+// El campo de relación en msh_procedimientos es "paciente_id".
 export async function crearProcedimiento(pacienteId, datos) {
   return apiFetch('/collections/' + COL_PROCEDIMIENTOS + '/records', {
     method: 'POST',
-    body: JSON.stringify({ ...datos, paciente: pacienteId, paciente_id: pacienteId }),
+    body: JSON.stringify({ ...datos, paciente_id: pacienteId }),
   });
 }
 
@@ -234,7 +240,7 @@ export async function buscarProcesosPorDni(dni) {
   const paciente = dataPac.items && dataPac.items.length ? dataPac.items[0] : null;
   if (!paciente) return null;
 
-  const filtroProc = encodeURIComponent("(paciente='" + paciente.id + "' || paciente_id='" + paciente.id + "')");
+  const filtroProc = encodeURIComponent("(paciente_id='" + paciente.id + "')");
   const dataProc = await apiFetchPublico(
     '/collections/' + COL_PROCEDIMIENTOS + '/records?perPage=100&sort=-fecha&filter=' + filtroProc);
 

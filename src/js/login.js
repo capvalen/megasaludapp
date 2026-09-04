@@ -6,6 +6,11 @@
 
 import { login } from './api.js';
 
+// Registro del service worker (PWA instalable)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
 const DOMINIO = '@megasaludhyo.com';
 
 document.addEventListener('DOMContentLoaded', () => {

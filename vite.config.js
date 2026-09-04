@@ -5,16 +5,17 @@ import mpaModule from 'vite-plugin-mpa';
 const mpa = mpaModule.default || mpaModule;
 
 // Aplicación multi-página con URLs limpias:
-//   /login/  -> src/pages/login/index.html
-//   /dashboard/ -> src/pages/dashboard/index.html
-//   /perfil/ -> src/pages/perfil/index.html
+//   /bienvenida/ -> src/pages/bienvenida/index.html (página por defecto)
+//   /login/      -> src/pages/login/index.html
+//   /dashboard/  -> src/pages/dashboard/index.html
+//   /perfil/     -> src/pages/perfil/index.html
 // vite-plugin-mpa escanea src/pages/**/index.html y reescribe las URLs
 // en el dev server (connect-history-api-fallback).
 export default defineConfig({
   base: './',
   plugins: [
     mpa({
-      open: '/login/',
+      open: '/bienvenida/',
       scanDir: 'src/pages',
       scanFile: 'index.html',
       filename: 'index.html',

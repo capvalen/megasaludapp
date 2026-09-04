@@ -13,6 +13,11 @@ import {
   crearPaciente,
 } from './api.js';
 
+// Registro del service worker (PWA instalable)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
 const POR_PAGINA = 15;
 
 const estado = {
@@ -62,6 +67,7 @@ function bindEventos() {
 
   document.getElementById('btnSalir').addEventListener('click', cerrarSesion);
   document.getElementById('btnNuevoPaciente').addEventListener('click', abrirModalNuevoPaciente);
+  document.getElementById('btnOrdenPacientes').addEventListener('click', alternarOrden);
   document.getElementById('formPaciente').addEventListener('submit', guardarPaciente);
 
   // Búsqueda de DNI con debounce (se dispara al completar 8 dígitos)
@@ -75,11 +81,9 @@ function bindEventos() {
     }
   });
 
-  // Cerrar modales
+  // Cerrar modales (solo con el botón X o Cancelar; el clic fuera NO cierra)
   document.querySelectorAll('[data-cerrar]').forEach((b) =>
     b.addEventListener('click', () => cerrarModal(b.dataset.cerrar)));
-  document.querySelectorAll('.modal-fondo').forEach((m) =>
-    m.addEventListener('click', (e) => { if (e.target === m) cerrarModal(m.id); }));
 }
 
 /* ---------- Lista de pacientes ---------- */
@@ -104,6 +108,23 @@ function pacientesFiltrados() {
   });
 }
 
+// Alterna el orden (asc/desc) del campo activo
+function alternarOrden() {
+  estado.orden.dir = estado.orden.dir === 'asc' ? 'desc' : 'asc';
+  estado.pagina = 1;
+  renderLista();
+}
+
+// Actualiza el ícono y texto del botón de orden
+function actualizarBotonOrden() {
+  const btn = document.getElementById('btnOrdenPacientes');
+  const texto = document.getElementById('btnOrdenTexto');
+  const asc = estado.orden.dir === 'asc';
+  btn.querySelector('.ti').className = 'ti ' + (asc ? 'ti-sort-ascending' : 'ti-sort-descending');
+  texto.textContent = asc ? 'A-Z' : 'Z-A';
+  btn.title = asc ? 'Ordenar de Z a A (descendente)' : 'Ordenar de A a Z (ascendente)';
+}
+
 function renderLista() {
   const lista = pacientesFiltrados();
   const totalPaginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
@@ -120,6 +141,7 @@ function renderLista() {
     f.textContent = th.dataset.campo === estado.orden.campo
       ? (estado.orden.dir === 'asc' ? '▲' : '▼') : '';
   });
+  actualizarBotonOrden();
 
   const tbody = document.getElementById('cuerpoTabla');
   tbody.innerHTML = '';
@@ -246,8 +268,9 @@ async function guardarPaciente(e) {
     const nuevo = await crearPaciente(datos);
     estado.pacientes.push(nuevo);
     cerrarModal('modalPaciente');
-    renderLista();
     mostrarToast('Paciente registrado', 'ok');
+    // Redirigir al perfil del paciente recién creado
+    setTimeout(() => abrirPerfil(nuevo.id), 600);
   } catch (err) {
     mostrarToast('Error: ' + err.message, 'error');
   } finally {
